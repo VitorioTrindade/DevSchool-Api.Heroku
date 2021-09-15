@@ -8,43 +8,90 @@ app.use(express.json());
 
 app.get ('/matricula', async (req, resp) => {
     try {
-        let alunos = await db.tb_matricula.findAll();
+        let alunos = await db.tb_matricula.findAll({
+            order: [['id_matricula', 'desc']],
+        });
         resp.send(alunos);
     } catch (e) {
-        resp.send({ erro: "Ocorreu um erro no get!"})
+        resp.send({ erro: e.toString() });
     }
 })
 
 app.post ('/matricula', async (req, resp) => {
     try {
-        let aluno = req.body;
+        let { nome, chamada, curso, turma } = req.body;
 
-        let v = await db.tb_matricula.findOne({ where: { nm_aluno: aluno.nome } })
+        let w = req.body;
+
+        let v = await db.tb_matricula.findOne({ where: { nm_aluno: nome } })
+        let sala = await db.tb_matricula.findOne({ where: { nm_turma: w.turma } });
+        let numero = await db.tb_matricula.findOne({ where: { nr_chamada: w.chamada } });
+
         if (v != null)
-            return resp.send({ erro: 'O aluno já existe!' });
+            return resp.send({ erro: 'Aluno já existe!' });
+
+        if (nome === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O nome do aluno é obrigatório!' });
+
+        if (chamada === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O campo da chamada é obrigatório!' });
+
+        if (chamada < 0 )
+            return resp.send({ erro: 'O número da chamada não pode ser negativo' });
+
+        if ( sala != null && numero != null )
+            return resp.send({ erro: 'Já existe um aluno com esse número' });    
+
+        if (curso === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O nome do curso é obrigatório!' });
+
+        if (turma === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O nome da turma é obrigatório!' });
 
         let r = await db.tb_matricula.create({
-            nm_aluno: aluno.nome,
-            nr_chamada: aluno.numero,
-            nm_curso: aluno.curso,
-            nm_turma: aluno.turma
+            nm_aluno: nome,
+            nr_chamada: chamada,
+            nm_curso: curso,
+            nm_turma: turma
         })
         resp.send(r);
     } catch (e) {
-        resp.send({ erro: "Ocorreu um erro no post!"})
+        resp.send({ erro: e.toString() });
     }
 })
 
 app.put ('/matricula/:id', async (req, resp) => {
     try {
         let id = req.params.id;
-        let aluno = req.body.nome;
+        let { nome, chamada, curso, turma } = req.body;
 
-        let r = await db.tb_matricula.update({ nm_aluno: aluno }, { where: { id_matricula: id }})
+        if (nome === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O nome do aluno é obrigatório!' });
+
+        if (chamada === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O campo da chamada é obrigatório!' });
+
+        if (chamada < 0 )
+            return resp.send({ erro: 'O número da chamada não pode ser negativo' });
+
+        if (curso === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O nome do curso é obrigatório!' });
+
+        if (turma === '' || nome.replace(/\n/g, '') == '')
+            return resp.send({ erro: 'O nome da turma é obrigatório!' });
+
+        let r = await db.tb_matricula.update(
+            { 
+                nm_aluno: nome,
+                nr_chamada: chamada,
+                nm_curso: curso,
+                nm_turma: turma 
+            },
+            { where: { id_matricula: id }})
 
             resp.sendStatus(200)
     } catch (e) {
-        resp.send({ erro: "Ocorreu um erro no put!"})
+        resp.send({ erro: e.toString() });
     }
 }) 
 
@@ -53,7 +100,7 @@ app.delete('/matricula/:id', async (req, resp) => {
         let r = await db.tb_matricula.destroy({ where: { id_matricula: req.params.id } });
         resp.sendStatus(200);
     } catch (e) {
-        resp.send({ erro: "Deu erro no delete!"});
+        resp.send({ erro: e.toString() });
     }
 })
 
