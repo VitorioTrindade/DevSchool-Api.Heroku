@@ -27,9 +27,6 @@ app.post ('/matricula', async (req, resp) => {
         let sala = await db.tb_matricula.findOne({ where: { nm_turma: w.turma } });
         let numero = await db.tb_matricula.findOne({ where: { nr_chamada: w.chamada } });
 
-        if (v != null)
-            return resp.send({ erro: 'Aluno já existe!' });
-
         if (nome === '' || nome.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome do aluno é obrigatório!' });
 
@@ -73,6 +70,9 @@ app.put ('/matricula/:id', async (req, resp) => {
 
         if (chamada < 0 )
             return resp.send({ erro: 'O número da chamada não pode ser negativo' });
+
+        if (chamada != Number(chamada) )
+            return resp.send({ erro: 'O campo da chamada tem que ser preenchido com números!' });
 
         if (curso === '' || nome.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome do curso é obrigatório!' });
