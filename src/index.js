@@ -30,19 +30,22 @@ app.post ('/matricula', async (req, resp) => {
         if (nome === '' || nome.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome do aluno é obrigatório!' });
 
-        if (chamada === '' || nome.replace(/\n/g, '') == '')
+        if (chamada === '')
             return resp.send({ erro: 'O campo da chamada é obrigatório!' });
 
         if (chamada < 0 )
             return resp.send({ erro: 'O número da chamada não pode ser negativo' });
+        
+        if (chamada != Number(chamada) )
+            return resp.send({ erro: 'O campo da chamada tem que ser preenchido com números!' });
 
         if ( sala != null && numero != null )
             return resp.send({ erro: 'Já existe um aluno com esse número' });    
 
-        if (curso === '' || nome.replace(/\n/g, '') == '')
+        if (curso === '' || curso.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome do curso é obrigatório!' });
 
-        if (turma === '' || nome.replace(/\n/g, '') == '')
+        if (turma === '' || turma.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome da turma é obrigatório!' });
 
         let r = await db.tb_matricula.create({
@@ -65,7 +68,7 @@ app.put ('/matricula/:id', async (req, resp) => {
         if (nome === '' || nome.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome do aluno é obrigatório!' });
 
-        if (chamada === '' || nome.replace(/\n/g, '') == '')
+        if (chamada === '')
             return resp.send({ erro: 'O campo da chamada é obrigatório!' });
 
         if (chamada < 0 )
@@ -74,10 +77,10 @@ app.put ('/matricula/:id', async (req, resp) => {
         if (chamada != Number(chamada) )
             return resp.send({ erro: 'O campo da chamada tem que ser preenchido com números!' });
 
-        if (curso === '' || nome.replace(/\n/g, '') == '')
+        if (curso === '' || curso.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome do curso é obrigatório!' });
 
-        if (turma === '' || nome.replace(/\n/g, '') == '')
+        if (turma === '' || turma.replace(/\n/g, '') == '')
             return resp.send({ erro: 'O nome da turma é obrigatório!' });
 
         let r = await db.tb_matricula.update(
@@ -100,7 +103,7 @@ app.delete('/matricula/:id', async (req, resp) => {
         let r = await db.tb_matricula.destroy({ where: { id_matricula: req.params.id } });
         resp.sendStatus(200);
     } catch (e) {
-        resp.send({ erro: e.toString() });
+        resp.send({ erro: e.toString() }); 
     }
 })
 
